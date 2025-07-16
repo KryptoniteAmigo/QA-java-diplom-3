@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import page_object.MainPage;
 
@@ -31,17 +32,21 @@ public class ConstructorTest {
     @Before
     public void setUp() {
         driver = WebDriverFactory.getWebDriver(browserName);
+        driver.manage().window().setSize(new Dimension(1500, 1350));
     }
 
     @Test
     public void checkBunsTabTest() {
         MainPage mainPage = new MainPage(driver);
         mainPage.open();
-        mainPage.clickFillingButton(); //добавил, так как по дефолту уже включена вкладка "Булки" и кнопка некликабельна
-        mainPage.clickBunsButton(); //и вот здесь ее уже можно нажать
+        mainPage.clickFillingButton();
+        mainPage.clickBunsButton();
+        mainPage.pause(2000);
 
-        boolean isVisible = mainPage.isElementInViewport(mainPage.getBunsItem());
-        Assert.assertTrue("Первый элемент из раздела 'Булки' не отображается целиком", isVisible);
+        boolean isVisibleSauceItem = mainPage.isElementInViewport(mainPage.getSauceItem());
+        boolean isDisplayedTab = mainPage.isElementDisplayed(mainPage.getBunsTabSelected());
+        Assert.assertTrue("Не сработал переход на вкладку 'Булки'", isDisplayedTab);
+        Assert.assertTrue("Элемент из раздела 'Соусы' не отобразился во вкладке 'Булки'", isVisibleSauceItem);
     }
 
     @Test
@@ -49,9 +54,13 @@ public class ConstructorTest {
         MainPage mainPage = new MainPage(driver);
         mainPage.open();
         mainPage.clickSauceButton();
+        mainPage.pause(2000);
 
-        boolean isVisible = mainPage.isElementInViewport(mainPage.getSauceItem());
-        Assert.assertTrue("Первый элемент из раздела 'Соусы' не отображается целиком", isVisible);
+        boolean isVisibleFillingItem = mainPage.isElementInViewport(mainPage.getFillingsItem());
+        boolean isDisplayedTab = mainPage.isElementDisplayed(mainPage.getSauceTabSelected());
+        Assert.assertTrue("Не сработал переход на вкладку 'Соусы'", isDisplayedTab);
+        //проверяю, что начинки отображаются на экране после клика по вкладке с соусами (на вкладке с булками их видно не будет)
+        Assert.assertTrue("Элемент из раздела 'Начинки' не отобразился во вкладке 'Соусы'", isVisibleFillingItem);
     }
 
     @Test
@@ -59,9 +68,12 @@ public class ConstructorTest {
         MainPage mainPage = new MainPage(driver);
         mainPage.open();
         mainPage.clickFillingButton();
+        mainPage.pause(2000);
 
-        boolean isVisible = mainPage.isElementInViewport(mainPage.getFillingsItem());
-        Assert.assertTrue("Первый элемент из раздела 'Начинки' не отображается целиком", isVisible);
+        boolean isVisibleSauceItem = mainPage.isElementInViewport(mainPage.getSauceItem());
+        boolean isDisplayedTab = mainPage.isElementDisplayed(mainPage.getFillingTabSelected());
+        Assert.assertTrue("Не сработал переход на вкладку 'Начинки'", isDisplayedTab);
+        Assert.assertFalse("Элемент из раздела 'Соусы' не должен отображаться во вкладке 'Начинки'", isVisibleSauceItem);
     }
 
     @After

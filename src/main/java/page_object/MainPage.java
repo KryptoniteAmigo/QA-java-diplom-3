@@ -6,6 +6,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.List;
 
 public class MainPage {
     private WebDriver driver;
@@ -17,8 +18,11 @@ public class MainPage {
     private final By mainLogoButton = By.xpath(".//div[@class='AppHeader_header__logo__2D0X2']");
     private final By constructorButton = By.xpath(".//p[contains(@class,'AppHeader_header__linkText')and text()='Конструктор']");
     private final By bunsButton = By.xpath(".//span[contains(@class,'text text_type_main-default')and text()='Булки']");
+    private final By bunsTabSelected = By.xpath(".//div[contains(@class, 'tab_tab_type_current') and .//span[text()='Булки']]");
     private final By sauceButton = By.xpath(".//span[contains(@class,'text text_type_main-default')and text()='Соусы']");
+    private final By sauceTabSelected = By.xpath(".//div[contains(@class, 'tab_tab_type_current') and .//span[text()='Соусы']]");
     private final By fillingsButton = By.xpath(".//span[contains(@class,'text text_type_main-default')and text()='Начинки']");
+    private final By fillingTabSelected = By.xpath(".//div[contains(@class, 'tab_tab_type_current') and .//span[text()='Начинки']]");
     private final By makeAnOrderButton = By.xpath(".//button[contains(@class,'button_button__33qZ0')and text()='Оформить заказ']");
     private final By firstBunItem = By.xpath(".//img[@alt='Флюоресцентная булка R2-D3']");
     private final By firstSauceItem = By.xpath(".//img[@alt='Соус Spicy-X']");
@@ -80,6 +84,18 @@ public class MainPage {
         return firstFillingItem;
     }
 
+    public By getBunsTabSelected() {
+        return bunsTabSelected;
+    }
+
+    public By getSauceTabSelected() {
+        return sauceTabSelected;
+    }
+
+    public By getFillingTabSelected() {
+        return fillingTabSelected;
+    }
+
     @Step("Проверяем, что кнопка 'Оформить заказ' отображается")
     public boolean isMakeAnOrderButtonVisible(){
         WebElement element = new WebDriverWait(driver, Duration.ofSeconds(3))
@@ -90,9 +106,8 @@ public class MainPage {
     @Step("Проверяем, что элемент отображается на странице")
     public boolean isElementInViewport(By locator) {
         WebElement element = driver.findElement(locator);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
 
-        new WebDriverWait(driver, Duration.ofSeconds(3))
+        new WebDriverWait(driver, Duration.ofSeconds(2))
                 .until(ExpectedConditions.visibilityOfElementLocated(locator));
 
         Rectangle rect = element.getRect();
@@ -102,6 +117,12 @@ public class MainPage {
         boolean withinY = rect.getY() >= 0 && (rect.getY() + rect.getHeight()) <= windowSize.getHeight();
 
         return withinX && withinY;
+    }
+
+    @Step("Проверяем наличие элемента на странице")
+    public boolean isElementDisplayed(By locator) {
+        List<WebElement> elements = driver.findElements(locator);
+        return !elements.isEmpty() && elements.get(0).isDisplayed();
     }
 
     @Step("Авторизуемся через кнопку 'Вход'")
@@ -119,6 +140,16 @@ public class MainPage {
         loginPage = new LoginPage(driver);
         loginPage.loginUser(email, password);
     }
+
+    @Step("Делаем явную паузу")
+    public void pause(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
 
 
 
